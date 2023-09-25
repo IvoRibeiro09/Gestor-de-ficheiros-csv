@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/wait.h>
 #include "../include/rides.h"
 #include "../include/drivers.h"
 #include "../include/users.h"
@@ -114,7 +120,7 @@ void parser_users(Cat_Users cat_users, char* path) {
 		}
         
 	}
-	printf("Hashtable dos users criada com %d válidos\n",get_cat_users_length(cat_users));
+	//printf("Hashtable dos users criada com %d válidos\n",get_cat_users_length(cat_users));
 
 	fclose(f_users);
 }
@@ -141,7 +147,7 @@ void parser_drivers(Cat_Drivers cat_drivers, char* path) {
 			insert_driver(fields[0], create_driver(fields), cat_drivers); 
 		}
 	}
-	printf("Hashtable dos drivers criada com %d válidos\n",get_cat_size(cat_drivers));
+	//printf("Hashtable dos drivers criada com %d válidos\n",get_cat_size(cat_drivers));
 	
 	fclose(f_drivers); 
 }
@@ -197,6 +203,69 @@ int new_rides(Cat_Users cat_users, Cat_Drivers cat_drivers,Cat_Driver_Ride cdr, 
 
 	fclose(f_rides);
 	fclose(val);
+	return valid;
+}
+
+int new_rides2(Cat_Users cat_users, Cat_Drivers cat_drivers,Cat_Driver_Ride cdr, char* path){
+	char *f_path = "/rides.csv";
+	char tmp[40];
+	strcpy(tmp, path);
+	strcat(tmp, f_path);
+
+	char buffer1[1024];
+	char* fields[10];
+	char buffer2[1024];
+	int valid = 0;
+	double custoPorRide;
+	char year[5], month[3], day[3];
+
+	int f;
+    if ((f = mkfifo("ola", 0666)) < 0) puts("ficheiro ja existe!");
+	int fifo = open("ola", O_RDWR);
+
+
+	int filho = fork();
+	if(filho != 0){
+		//filho insere nas estruturas
+		int NbytesRead;
+		while((NbytesRead = read(fifo, buffer2, 1024)) > 0){ 
+			printf("%s", buffer2);
+			//sscanf(buffer2, "%d;%d;%s;%f;%d;%f;%c;%s;%s;%d;%d;%s;%s\n", &pid, &start_sec, &start_milisec, message);
+		}
+		close(fifo);
+		exit(0);
+		printf("MOrri\n");
+	}
+	
+	//pai le as linhas
+	FILE *f_rides = fopen(tmp, "r");
+	if (f_rides == NULL) { puts("Missing file in rides parser"); exit(1); }
+
+	fgets(buffer1, 1000, f_rides); 
+	while(fgets(buffer1, 1000, f_rides) != NULL) {	
+		get_fields(buffer1, fields);
+		if(search_user(fields[3],cat_users) && search_driver(fields[2],cat_drivers) && strlen(fields[0]) > 0 && verifyDate(fields[1],year,month,day) == 0 && strlen(fields[2]) > 0 && strlen(fields[3]) > 0 && strlen(fields[4]) > 0 && verifyInt(fields[5]) == 0 && verifyIntdecimal(fields[6]) == 0 && verifyIntdecimal(fields[7]) == 0 && verifyIntdecimal(fields[8]) == 0){
+			valid++;
+			sprintf(buffer1,"%d;%d;%s;%s;%s;%s;%s;%s;%s;\n",atoi(fields[0]), atoi(fields[1]), fields[2], fields[3], fields[4], fields[5], fields[6], fields[7], fields[8]);
+			write(fifo, buffer1, 1024);
+		}
+		free(fields[0]);
+		free(fields[1]);
+		free(fields[2]);
+		free(fields[3]);
+		free(fields[4]); 
+		free(fields[5]);
+		free(fields[6]);
+		free(fields[7]);
+		free(fields[8]);
+		free(fields[9]);
+	}
+	close(fifo);
+	fclose(f_rides);
+
+	int status;
+    wait(&status);
+
 	return valid;
 }
 

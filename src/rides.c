@@ -123,7 +123,6 @@ Ride *get_rides_list(int tamanho){
 		free(fields[10]);
 	}
 
-	printf("Lista de Rides criada com %d válidos\n",j);
 	return rides;
 }
 

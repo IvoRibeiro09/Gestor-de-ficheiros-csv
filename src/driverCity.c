@@ -72,8 +72,6 @@ DriverCity *get_drivercity_list(int tamanho){
 	}
 
     ordenaDriverRides(auxdc,0,j-1);
-    
-    printf("Lista de Driver_Rides criada com %d válidos\n",j);
 
     fclose(fdc);
 

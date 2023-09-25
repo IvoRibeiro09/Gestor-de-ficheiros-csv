@@ -93,7 +93,6 @@ ValidDriver *get_drivers_list(int tamanho){
 	}
 
 	ordenaDrivers(drivers,0,j-1);
-	printf("Lista de Drivers ativos criada com %d válidos\n",j);
 
 	return drivers;
 }

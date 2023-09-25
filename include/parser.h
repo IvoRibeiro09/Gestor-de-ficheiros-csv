@@ -35,6 +35,8 @@ void parser_drivers(Cat_Drivers cat_drivers, char* path);
 
 int new_rides(Cat_Users cat_users, Cat_Drivers cat_drivers,Cat_Driver_Ride cdr, char* path);
 
+int new_rides2(Cat_Users cat_users, Cat_Drivers cat_drivers,Cat_Driver_Ride cdr, char* path);
+
 void batchmode(ValidUser *users, ValidDriver *drivers, Ride *rides, DriverCity *driverrides, int t_users, int t_drivers, int t_rides, int t_dc ,char* commands);
 
 void iterativemode(ValidUser *users, ValidDriver *drivers, Ride *rides, DriverCity *driverrides, int t_users, int t_drivers, int t_rides, int t_dc);

@@ -99,7 +99,6 @@ ValidUser *get_users_list(int tamanho){
 	}
 
 	ordenaUsers(users,0,j-1);
-	printf("Lista de Users ativos criada com %d válidos\n",j);
 
 	fclose(fusers);
 
